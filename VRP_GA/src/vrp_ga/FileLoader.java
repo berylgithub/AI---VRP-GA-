@@ -34,7 +34,8 @@ public class FileLoader {
             tempNode.setDemand(Double.valueOf(splitLine[3]));
             tempArrNode.add(tempNode);
         }
-        arrNode=tempArrNode;
+        arrNode.clear();
+        arrNode.addAll(tempArrNode);
     }
 
     public ArrayList<Node> getArrNode() {

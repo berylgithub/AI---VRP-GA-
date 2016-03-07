@@ -6,6 +6,7 @@
 package vrp_ga;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 /**
@@ -17,6 +18,7 @@ public class Populasi {
     ArrayList<Kromosom> arrKrom = new ArrayList<>();
     double probCross, probMutate;
     int totalPopulation, curGeneration;
+    Kromosom bestKromosom;
 
     public Populasi() {
     }
@@ -25,6 +27,7 @@ public class Populasi {
         this.probCross = probCross;
         this.probMutate = probMutate;
         this.totalPopulation = totalPopulation;
+        bestKromosom=new Kromosom();
     }
 
     public Populasi(double probCross, double probMutate, int totalPopulation, int generation) {
@@ -32,6 +35,7 @@ public class Populasi {
         this.probMutate = probMutate;
         this.totalPopulation = totalPopulation;
         this.curGeneration = generation;
+        bestKromosom=new Kromosom();
     }
     
     public ArrayList<Kromosom> getArrKrom() {
@@ -39,7 +43,7 @@ public class Populasi {
     }
 
     public void setArrKrom(ArrayList<Kromosom> arrKrom) {
-        this.arrKrom = arrKrom;
+        this.arrKrom.addAll(arrKrom);
     }
 
     public ArrayList<Node> getArrNode() {
@@ -47,7 +51,7 @@ public class Populasi {
     }
 
     public void setArrNode(ArrayList<Node> arrNode) {
-        this.arrNode = arrNode;
+        this.arrNode.addAll(arrNode);
     }
     
     public double getProbCross() {
@@ -84,7 +88,7 @@ public class Populasi {
     }
     
     public void setPopulation(ArrayList<Kromosom> arrKrom){
-        this.arrKrom=arrKrom;
+        this.arrKrom.addAll(arrKrom);
     }
     
     public void createPopulation(){
@@ -120,23 +124,19 @@ public class Populasi {
     
     //method buat mutasi dalam 1 kromosom
     public Kromosom mutateKromosom(Kromosom krom){
-        Kromosom tempKrom = krom, mutatedKrom = new Kromosom();
+        Kromosom tempKrom = new Kromosom(), mutatedKrom = new Kromosom();
+        tempKrom=krom;
         Node tempNodeA=null, tempNodeB=null;
         Random rand = new Random();
         int randomNumA = rand.nextInt(((30) - 0) + 1) + 0;
         int randomNumB = rand.nextInt(((30) - 0) + 1) + 0;
-        tempNodeA=tempKrom.getArrNode().get(randomNumA);
-        tempNodeB=tempKrom.getArrNode().get(randomNumB);
+        tempNodeA=krom.getArrNode().get(randomNumA);
+        tempNodeB=krom.getArrNode().get(randomNumB);
         tempKrom.getArrNode().set(randomNumA, tempNodeB);
         tempKrom.getArrNode().set(randomNumB, tempNodeA);
         tempKrom.calTotalDistance();
         tempKrom.calFitness();
-        if(tempKrom.getFitness()>krom.getFitness()){
-            mutatedKrom=tempKrom;
-        }
-        else if(tempKrom.getFitness()<=krom.getFitness()){
-            mutatedKrom=krom;
-        }
+        mutatedKrom=tempKrom;
         return mutatedKrom;
     }
     
@@ -144,16 +144,32 @@ public class Populasi {
         ArrayList<Kromosom> tempArrKrom=new ArrayList<>();
         int currentMax=arrKrom.size();
         for(int i=0; i<currentMax; i++){
-            for(int j=0; j<currentMax; j++){
-                Random rand = new Random();
-                double randDouble=rand.nextDouble();
-                if(randDouble<probCross){
-                    if(!arrKrom.get(i).equals(arrKrom.get(j))){
-                        Kromosom tempKrom=crossOverKromosom(arrKrom.get(i), arrKrom.get(j));
-                        tempArrKrom.add(tempKrom);
-                    }
+            Kromosom tempKrom=new Kromosom();
+            Random rand = new Random();
+            double randDouble=rand.nextDouble();
+            
+            if(randDouble<probCross){
+                int randomInt = rand.nextInt(((30) - 0) + 1) + 0;
+//                System.out.println(arrKrom.get(i).getArrNode().get(0).getIndex()+" "+arrKrom.get(randomInt).getArrNode().get(0).getIndex());
+                tempKrom=crossOverKromosom((Kromosom)arrKrom.get(i), (Kromosom)arrKrom.get(randomInt));
+                if(tempKrom.getFitness()!=arrKrom.get(i).getFitness()||tempKrom.getFitness()!=arrKrom.get(randomInt).getFitness()){
+                    tempArrKrom.add(tempKrom);
                 }
+                
             }
+//            for(int j=0; j<currentMax; j++){
+//                Random rand = new Random();
+//                double randDouble=rand.nextDouble();
+//                if(randDouble<probCross){
+//                    Kromosom tempKrom=new Kromosom(), tempKromA=new Kromosom(), tempKromB=new Kromosom();
+//                    tempKromA=arrKrom.get(i);
+//                    tempKromB=arrKrom.get(j);
+//                    System.out.println(tempKromA.getFirstNode().getIndex()+" "+tempKromB.getFirstNode().getIndex());
+//                    tempKrom=crossOverKromosom((Kromosom)tempKromA, (Kromosom)tempKromB);
+//                    tempArrKrom.add((Kromosom)tempKrom);
+//                }
+//            }
+//            System.out.println(i);
         }
         arrKrom.addAll(tempArrKrom);
     }
@@ -166,21 +182,57 @@ public class Populasi {
             double randDouble=rand.nextDouble();
             if(randDouble<probMutate){
                 Kromosom tempKrom = mutateKromosom(arrKrom.get(i));
-                if(!tempKrom.equals(arrKrom.get(i))){
-                    tempArrKrom.add(tempKrom);
+                if(tempKrom.getFitness()!=arrKrom.get(i).getFitness()){
+                    arrKrom.add(tempKrom);
+                }
+                
+            }
+        }
+    }
+    
+    public void selectBestKroms(int startMinIndex){
+        ArrayList<Double> arrDouble=new ArrayList<>();
+        ArrayList<Kromosom> arrTempKrom=new ArrayList<>();
+        for(int i=0; i<arrKrom.size(); i++){
+            arrDouble.add(arrKrom.get(i).getFitness());
+        }
+        Collections.sort(arrDouble, Collections.reverseOrder());
+        for(int i=0; i<startMinIndex; i++){
+            for(int j=0; j<arrKrom.size(); j++){
+                if(arrKrom.get(j).getFitness()==arrDouble.get(i)){
+                    arrTempKrom.add(arrKrom.get(j));
+                    if(i==0){
+                        bestKromosom=arrKrom.get(j);
+                    }
                 }
             }
         }
-        arrKrom.addAll(tempArrKrom);
+        arrKrom.clear();
+        arrKrom.addAll(arrTempKrom);
     }
-    
     public void testPrint(){
-        System.out.println("==Population gen-0 Kromosoms==");
         for(int i=0; i<arrKrom.size(); i++){
+            System.out.print(i+" ");
             for(int j=0; j<arrKrom.get(i).getArrNode().size(); j++){
                 System.out.print(arrKrom.get(i).getArrNode().get(j).getIndex()+"-");
             }
             System.out.println("\tTotalDistance : "+arrKrom.get(i).getTotalDistance()+"\tFitness : "+arrKrom.get(i).getFitness());
         }
+    }
+    
+    public void testPrintWBestKrom(){
+        for(int i=0; i<arrKrom.size(); i++){
+            System.out.print(i+" ");
+            for(int j=0; j<arrKrom.get(i).getArrNode().size(); j++){
+                System.out.print(arrKrom.get(i).getArrNode().get(j).getIndex()+"-");
+            }
+            System.out.println("\tTotalDistance : "+arrKrom.get(i).getTotalDistance()+"\tFitness : "+arrKrom.get(i).getFitness());
+        }
+        System.out.println("Best Kromosom/Route : ");
+        for(int i=0; i<bestKromosom.getArrNode().size(); i++){
+            System.out.print(bestKromosom.getArrNode().get(i).getIndex()+"-");
+        }
+        System.out.println("\tTotalDistance : "+bestKromosom.getTotalDistance()+"\tFitness : "+bestKromosom.getFitness());
+        System.out.println();
     }
 }

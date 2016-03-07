@@ -30,8 +30,19 @@ public class TestPopulasi {
             pop.setArrNode(fL.getArrNode());
             pop.createPopulation();
             System.out.println(pop.getArrKrom().size());
+            System.out.println(pop.getArrKrom().get(38).getArrNode().size());
+            System.out.println("====Population-0 Kromosom :===");
             pop.testPrint();
-            //pop.testPrint();
+            
+            pop.crossOverAll();
+            System.out.println("====Hasil crossover :===");
+            pop.testPrint();
+            pop.mutateAll();
+            System.out.println("====Hasil mutasi :===");
+            pop.testPrint();
+            pop.selectBestKroms(50);
+            System.out.println("====Hasil Seleksi :===");
+            pop.testPrintWBestKrom();
         } catch (IOException ex) {
             Logger.getLogger(TestPopulasi.class.getName()).log(Level.SEVERE, null, ex);
         }

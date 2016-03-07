@@ -24,6 +24,8 @@ public class Kromosom {
         currentDemand=100;
         rechargeCount=0;
         totalDistance=0;
+        fitness=0;
+        firstNode=new Node();
     }
 
     public Kromosom(Node firstNode) {
@@ -39,7 +41,8 @@ public class Kromosom {
     }
 
     public void setArrNode(ArrayList<Node> arrNode) {
-        this.arrNode = arrNode;
+        this.arrNode.clear();
+        this.arrNode.addAll(arrNode);
     }
 
     public double getTotalDistance() {
@@ -82,7 +85,10 @@ public class Kromosom {
 //                iterator.remove();
 //            }
 //        }
-//        this.arrNode=tempArrNode;
+    }
+
+    public Node getFirstNode() {
+        return firstNode;
     }
     
     public void calFitness(){
@@ -122,19 +128,14 @@ public class Kromosom {
     
     public void calTotalDistance(){
         double tempDist=0, tempTotalDist=0;
-        for(int i=0; i<arrNode.size(); i++){
-            if((i+1)>=arrNode.size()){
-                break;
+        for(int i=0; i<arrNode.size()-1; i++){
+            boolean tempBool=false;
+            tempDist=calDistNode(arrNode.get(i), arrNode.get(i+1));
+            tempBool=deductDemand(arrNode.get(i).getDemand());
+            if(tempBool==true){
+                tempTotalDist=tempTotalDist+(2*calDistNode(firstNode, arrNode.get(i)));
             }
-            else{
-                boolean tempBool=false;
-                tempDist=calDistNode(arrNode.get(i), arrNode.get(i+1));
-                tempBool=deductDemand(arrNode.get(i).getDemand());
-                if(tempBool==true){
-                    tempTotalDist=tempTotalDist+(2*calDistNode(firstNode, arrNode.get(i)));
-                }
-                tempTotalDist=tempTotalDist+tempDist;
-            }
+            tempTotalDist=tempTotalDist+tempDist;
         }
         tempTotalDist=tempTotalDist+calDistNode(firstNode, arrNode.get(0))+calDistNode(firstNode, arrNode.get(arrNode.size()-1));
         totalDistance=tempTotalDist;
