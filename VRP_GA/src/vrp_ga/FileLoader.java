@@ -36,6 +36,14 @@ public class FileLoader {
         }
         arrNode=tempArrNode;
     }
+
+    public ArrayList<Node> getArrNode() {
+        return arrNode;
+    }
+
+    public void setArrNode(ArrayList<Node> arrNode) {
+        this.arrNode = arrNode;
+    }
     
     public void testPrint(){
         for(int i=0; i<arrNode.size(); i++){

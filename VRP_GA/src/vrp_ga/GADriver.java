@@ -12,6 +12,11 @@ import java.util.ArrayList;
  * @author Yorozuya
  */
 public class GADriver {
-    ArrayList<Node> arrNode=new ArrayList<>();
+  
+    
+    public GADriver() {
+    }
+
+
     
 }
