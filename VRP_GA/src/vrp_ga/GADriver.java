@@ -49,7 +49,7 @@ public class GADriver {
     }
     
     public void evolve(int n) throws FileNotFoundException{
-        PrintWriter printer = new PrintWriter("Best Route Per Generation.txt");
+        PrintWriter printer = new PrintWriter(urlSaveFile);
         for(int i=0; i<n; i++){
 //            System.out.println("====Generasi ke-"+i+"====");
             printer.println("====Generasi ke-"+i+"====");
@@ -64,7 +64,7 @@ public class GADriver {
             }
             printer.println("\tTotalDistance : "+this.population.bestKromosom.getTotalDistance()+"\tFitness : "+this.population.bestKromosom.getFitness());
             printer.println();
-            System.out.println("");
+//            System.out.println("");
         }
         printer.close();
     }

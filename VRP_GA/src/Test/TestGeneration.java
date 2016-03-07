@@ -28,6 +28,7 @@ public class TestGeneration {
         pop.createPopulation();
         GADriver gaDrive=new GADriver();
         gaDrive.setPopulation(pop);
+        gaDrive.setUrlSaveFile("Best Route Per Generation.txt");
         gaDrive.evolve(100);
     }
     
